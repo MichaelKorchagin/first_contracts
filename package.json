@@ -1,0 +1,19 @@
+{
+  "name": "first_contract",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Korchagin",
+  "license": "ISC",
+  "dependencies": {
+    "@npmcli/move-file": "^3.0.0",
+    "@openzeppelin/contracts": "^4.8.1"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.1",
+    "hardhat": "^2.12.6"
+  }
+}
