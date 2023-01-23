@@ -5,10 +5,9 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract SwapTokens {
 
-    IERC20 public kmdToken;
-    IERC20 public kkdToken; // его покупаем
+    IERC20 public kmdToken; // продаем его
+    IERC20 public kkdToken;
     address public owner;
-    address public taker;
     uint256 public price;
 
 //    mapping (address => uint) public journal;
@@ -17,18 +16,16 @@ contract SwapTokens {
         address _KMDToken,
         address _KKDToken,
         uint256 _price
-//        address _taker
     ) {
         kmdToken = IERC20(_KMDToken);  // меняется тип на интерфейс, чтоbы проще взаимодейтсвовать с контрактом
         kkdToken = IERC20(_KKDToken);
-        owner = msg.sender; // sender который деплоил
-//        taker = _taker;
+        owner = msg.sender; // sender тот, кто отправляет
         require(_price > 0, 'Price = 0');
         price = _price;
     }
 
     function setPrice(uint256 priceNow) external {
-        require(price > 0, 'Price = 0');
+        require(price > 0, 'Price can not = 0');
         price = priceNow;
     }
 
@@ -36,19 +33,23 @@ contract SwapTokens {
         return price;
     }
 
-    function swap(uint256 amountToBuy) external {
+    function buying(uint256 amountToBuy) external {
         require(amountToBuy > 0, 'Can`t buy zero');
 
-//        journal[msg.sender] = msg.value;
+        uint256 allowance = kkdToken.allowance(msg.sender, address(this));
+        require(allowance >= amountToBuy, 'Check allowance!');
 
-        kmdToken.transferFrom(msg.sender, address(this), amountToBuy * price);  // sender который покупает. Отправляет money на контракт (this)
-        kkdToken.transferFrom(address(this), msg.sender, amountToBuy); // заbрали деньги с контракта
-//        kmdToken.transferFrom(address(this), taker, amountToBuy * price);
+//        uint allowanceTwo = kmdToken.allowance(address(this), msg.sender);
+//        require(allowanceTwo >= amountToBuy, 'Check second allowance!');
+
+        kkdToken.transferFrom(msg.sender, address(this), amountToBuy);  // sender который покупает. Отправляет money на контракт (this)
+        kmdToken.transfer(msg.sender, amountToBuy); // заbрали деньги с контракта
     }
-
-//     function заbрать bаbки
-//    function takeTokensFromContract (uint256 amountToTake) external {
-//        require(amountToTake > 0, 'Can`t take zero');
-//        kmdToken.transferFrom(address(this), taker, amountToTake);
-//    }
 }
+
+// TODO:
+// 1. Юзер минтит коины на контракт
+// 2. Второй контракт продает другим юзерам коины
+
+// Апрув, чтоbы юзер смог снять ЧУЖИЕ коины с контракта
+// Отправить коины на контракт в тесте
